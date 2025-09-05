@@ -1,44 +1,39 @@
 #ifndef AIRPORT_H_INCLUDED
 #define AIRPORT_H_INCLUDED
+
 #include <iostream>
 #include <queue>
+#include <deque>
 #include <fstream>
+#include <string>
 
 using namespace std;
 
-#define SIZE 10
+// Airplane structure for storing details
+struct Airplane {
+    string flight;
+    string status; // "Arrived", "Ready for Takeoff", etc.
 
-class Queue{
-  private:
-  string flights[SIZE];
-  string status[SIZE];
-  int front, back;
-
-  public:
-  Queue();
-  bool isempty();
-  bool isfull();
-  void enqueue(string flight, string stat);
-  void dequeue(string& flight, string& stat);
-  void display(string title);
-
+    Airplane(string f, string s) : flight(f), status(s) {}
 };
-class Airport{
-  private:
-  Queue arrivals;
-  Queue departure;
-  ofstream logFile;
 
-  void logEvent(const string& event);
+class Airport {
+private:
+    queue<Airplane> arrivals;   // FIFO for arriving planes
+    deque<Airplane> departures; // Deque for flexible takeoff scheduling
+    ofstream logFile;
 
-  public:
-  Airport();
-  ~Airport();
+    void logEvent(const string& event);
 
-  void addArrival(string flight);
-  void addDeparture(string flight);
-  void landPlanes();
-  void takeoffPlanes();
-  void displayStatus();
+public:
+    Airport();
+    ~Airport();
+
+    void addArrival(string flight);
+    void addDeparture(string flight);
+    void landPlanes();
+    void takeoffPlanes();
+    void displayStatus();
 };
+
 #endif
