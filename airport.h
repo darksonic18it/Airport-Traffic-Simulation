@@ -9,18 +9,18 @@
 
 using namespace std;
 
-// Airplane structure for storing details
+// Airplane structure
 struct Airplane {
     string flight;
-    string status; // "Arrived", "Ready for Takeoff", etc.
+    string status; // Arrived, Landed, Ready for Takeoff, Took Off
 
     Airplane(string f, string s) : flight(f), status(s) {}
 };
 
 class Airport {
 private:
-    queue<Airplane> arrivals;   // FIFO for arriving planes
-    deque<Airplane> departures; // Deque for flexible takeoff scheduling
+    queue<Airplane> arrivals;   // Planes waiting to land
+    deque<Airplane> departures; // Planes waiting to take off
     ofstream logFile;
 
     void logEvent(const string& event);
@@ -31,9 +31,7 @@ public:
 
     void addArrival(string flight);
     void addDeparture(string flight);
-    void landPlanes();
-    void takeoffPlanes();
-    void displayStatus();
+    void displayStatus();  // now processes one plane at a time
 };
 
 #endif
