@@ -1,109 +1,82 @@
-#include "airport.h"
+#include "Airport.h"
 
-// Queue implementation
-Queue::Queue() {
-    front = -1;
-    back = -1;
-}
-
-bool Queue::isempty() {
-    return (front == -1 || front > back);
-}
-
-bool Queue::isfull() {
-    return (back == SIZE - 1);
-}
-
-void Queue::enqueue(string flight, string stat) {
-    if (isfull()) {
-        cout << "Queue is full" << endl;
-        return;
-    }
-    if (front == -1) {
-        front = 0; // initialize front on first insert
-    }
-    flights[++back] = flight;
-    status[back] = stat;
-}
-
-void Queue::dequeue(string &flight, string &stat) {
-    if (isempty()) {
-        cout << "Queue is empty" << endl;
-        flight = "";
-        stat = "";
-        return;
-    }
-    flight = flights[front];
-    stat = status[front];
-    front++;
-}
-
-void Queue::display(string title) {
-    cout << title << endl;
-    if (isempty()) {
-        cout << "Queue is empty" << endl;
-        return;
-    }
-    for (int i = front; i <= back; i++) {
-        cout << flights[i] << " - " << status[i] << endl;
-    }
-}
-
-// Airport implementation
 Airport::Airport() {
-    logFile.open("airport_log.txt", ios::out);
-    if (logFile.is_open()) {
-        logFile << "=== Airport Traffic Log ===" << endl;
+    logFile.open("airport_log.txt", ios::app);
+    if (!logFile) {
+        cerr << "Error opening log file!" << endl;
     }
 }
 
 Airport::~Airport() {
     if (logFile.is_open()) {
-        logFile << "=== End of Log ===" << endl;
         logFile.close();
     }
 }
 
-void Airport::logEvent(const string &event) {
+void Airport::logEvent(const string& event) {
     if (logFile.is_open()) {
         logFile << event << endl;
     }
 }
 
 void Airport::addArrival(string flight) {
-    arrivals.enqueue(flight, "waiting to land");
-    logEvent("Flight " + flight + " scheduled for arrival.");
+    Airplane plane(flight, "Arrived");
+    arrivals.push(plane);
+    cout << "Arrival added: " << flight << endl;
+    logEvent("Arrival added: " + flight);
 }
 
 void Airport::addDeparture(string flight) {
-    departure.enqueue(flight, "waiting to take off");
-    logEvent("Flight " + flight + " scheduled for departure.");
+    Airplane plane(flight, "Ready for Takeoff");
+    departures.push_back(plane);
+    cout << "Departure added: " << flight << endl;
+    logEvent("Departure added: " + flight);
 }
 
 void Airport::landPlanes() {
-    string flight, stat;
-    arrivals.dequeue(flight, stat);
-    if (flight != "") {
-        logEvent("Flight " + flight + " has landed.");
-        cout << flight << " has landed." << endl;
-    } else {
-        cout << "No planes waiting to land." << endl;
+    cout << "\n--- Landing Planes ---" << endl;
+    while (!arrivals.empty()) {
+        Airplane plane = arrivals.front();
+        arrivals.pop();
+        plane.status = "Landed";
+        cout << plane.flight << " has landed." << endl;
+        logEvent(plane.flight + " has landed.");
     }
 }
 
 void Airport::takeoffPlanes() {
-    string flight, stat;
-    departure.dequeue(flight, stat);
-    if (flight != "") {
-        cout << flight << " is taking off." << endl;
-        logEvent("Flight " + flight + " has taken off.");
-    } else {
-        cout << "No planes waiting to take off." << endl;
+    cout << "\n--- Taking Off Planes ---" << endl;
+    while (!departures.empty()) {
+        Airplane plane = departures.front();
+        departures.pop_front();
+        plane.status = "Took Off";
+        cout << plane.flight << " has taken off." << endl;
+        logEvent(plane.flight + " has taken off.");
     }
 }
 
 void Airport::displayStatus() {
-    cout << "--- Airport Status ---" << endl;
-    arrivals.display("Arrivals Queue:");
-    departure.display("Departure Queue:");
+    cout << "\n=== Airport Status ===" << endl;
+
+    cout << "\nArrivals Queue:" << endl;
+    if (arrivals.empty()) cout << "No arriving planes." << endl;
+    else {
+        queue<Airplane> temp = arrivals; // copy to display
+        while (!temp.empty()) {
+            Airplane plane = temp.front();
+            cout << plane.flight << " - Status: " << plane.status << endl;
+            temp.pop();
+        }
+    }
+
+    cout << "\nDepartures Queue:" << endl;
+    if (departures.empty()) cout << "No departing planes." << endl;
+    else {
+        deque<Airplane> temp = departures; // copy to display
+        while (!temp.empty()) {
+            Airplane plane = temp.front();
+            cout << plane.flight << " - Status: " << plane.status << endl;
+            temp.pop_front();
+        }
+    }
 }
