@@ -1,0 +1,12 @@
+arrive,PAL101
+arrive,CEB102
+depart,JPN201
+depart,PAG202
+depart,MNL203
+status
+priority_takeoff,MNL203
+status
+serve
+status
+serve_all
+status
