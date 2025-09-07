@@ -1,38 +1,37 @@
-#ifndef AIRPORT_H_INCLUDED
-#define AIRPORT_H_INCLUDED
+#ifndef RUNWAYMANAGER_H
+#define RUNWAYMANAGER_H
 
 #include <iostream>
-#include <queue> // queue for arrivals
-#include <deque> // deque for departures
-#include <fstream> // for file management
+#include <queue>
+#include <deque>
 #include <string>
-
+#include <fstream>
 using namespace std;
 
-// Airplane structure
-struct Airplane { 
-    string flight; // flight code
-    string status; // Arrived, Landed, Ready for Takeoff, Took Off
-
-    Airplane(string f, string s) : flight(f), status(s) {} // constructor
+struct Airplane {
+    string flight;
+    string status;
+    Airplane(string f, string s) : flight(f), status(s) {}
 };
 
-class Airport {
+class RunwayManager {
 private:
-    queue<Airplane> arrivals;   // Planes waiting to land
-    deque<Airplane> departures; // Planes waiting to take off
-    ofstream logFile; // file to record
+    queue<Airplane> landingQueue;
+    deque<Airplane> takeoffDeque;
+    ofstream logFile;
 
-    void logEvent(const string& event); // to add text to logfile
+    void logEvent(const string& event);
 
 public:
-    Airport(); // cosntructor
-    ~Airport(); // destructor
+    RunwayManager();
+    ~RunwayManager();
 
-    void addArrival(string flight); // add arrivals
-    void addDeparture(string flight); // add departures
-    void displayStatus();  // now processes one plane at a time
+    void addArrival(const string& flight);
+    void addDeparture(const string& flight);
+    void serve();
+    void serveAll();
+    void priorityTakeoff(const string& flight);
+    void displayStatus();
 };
 
 #endif
-
